@@ -1,0 +1,416 @@
+PROG 1
+
+CREATE TABLE Employee (
+ EMPNO INT,
+ ENAME VARCHAR(50),
+ JOB VARCHAR(50),
+ MANAGER_NO INT,
+ SAL DECIMAL(10, 2),
+ COMMISSION DECIMAL(10, 2)
+);
+CREATE USER my_user IDENTIFIED BY 'my_password';
+GRANT ALL PRIVILEGES ON Employee TO my_user;
+INSERT INTO Employee (EMPNO, ENAME, JOB, MANAGER_NO, SAL, COMMISSION)
+VALUES
+ (1, 'John Doe', 'Manager', 1001, 5000.00, 1000.00),
+ (2, 'Jane Smith', 'Assistant', 1001, 4000.00, NULL),
+ (3, 'Alice Johnson', 'Clerk', 1002, 3000.00, 500.00);
+ROLLBACK;
+ALTER TABLE Employee
+ADD CONSTRAINT PK_Employee_EMPNO PRIMARY KEY (EMPNO);
+ALTER TABLE Employee
+MODIFY ENAME VARCHAR(50) NOT NULL,
+MODIFY JOB VARCHAR(50) NOT NULL,
+MODIFY MANAGER_NO INT NOT NULL,
+MODIFY SAL DECIMAL(10, 2) NOT NULL;
+INSERT INTO Employee VALUES ( 04 ,'aslam', 'mgr', 01, 750000.00, 10.02);
+
+
+
+
+PROG 3
+
+CREATE TABLE Employee01 (
+
+ E_id INT PRIMARY KEY,
+
+ E_name VARCHAR(50),
+
+ Age INT,
+
+ Salary int
+
+);
+
+INSERT INTO Employee01 (E_id, E_name, Age, Salary)
+
+VALUES
+
+ (1, 'John Doe', 30, 50000),
+
+ (2, 'Jane Smith', 25, 45000),
+
+ (3, 'Alice Johnson', 35, 60000),
+
+ (4, 'Bob Brown', 28, 48000),
+
+ (5, 'Emily Davis', 32, 55000);
+
+select * from Employee01
+
+SELECT COUNT(E_name) AS Number_of_Employees FROM Employee01;
+
+SELECT MAX(Age) AS Maximum_Age FROM Employee01;
+
+SELECT MIN(Age) AS Minimum_Age FROM Employee01;
+
+SELECT Salary FROM Employee01 ORDER BY Salary ASC;
+
+SELECT Salary, COUNT(*) AS Number_of_Employees 
+
+FROM Employee01
+
+GROUP BY Salary;
+
+
+
+
+prog 4
+
+CREATE TABLE CUSTOMERS13 (
+
+ ID INT PRIMARY KEY, 1. Compile & Execute Customers13
+
+ NAME VARCHAR(255),
+
+ AGE INT,
+
+ ADDRESS VARCHAR(255),
+
+ SALARY DECIMAL(10, 2)
+
+);
+
+CREATE TABLE Salary_Log (
+
+ ID INT AUTO_INCREMENT PRIMARY KEY, 2. Compile & Execute
+
+ Action VARCHAR(50), Salary_log
+
+ Old_Salary DECIMAL(10, 2),
+
+ New_Salary DECIMAL(10, 2),
+
+ Salary_Difference DECIMAL(10, 2),
+
+ Action_Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+);
+
+DELIMITER $$ Create the Customer_insert 
+
+CREATE TRIGGER customer_insert Trigger
+
+AFTER INSERT ON CUSTOMERS13
+
+FOR EACH ROW
+
+BEGIN
+
+ INSERT INTO Salary_Log (Action, New_Salary)
+
+ VALUES ('INSERT', NEW.SALARY);
+
+END$$
+
+DELIMITER ;
+INSERT INTO CUSTOMERS13 (ID, NAME, AGE, ADDRESS, SALARY) VALUES (1, 'Dr 
+
+Aslam', 30, '123 Elm St', 50000.00);
+
+SELECT * FROM Salary_Log;
+
+DELIMITER $$
+
+CREATE TRIGGER customer_delete Create the trigger customer_delete
+
+AFTER DELETE ON CUSTOMERS13
+
+FOR EACH ROW
+
+BEGIN
+
+ INSERT INTO Salary_Log (Action, Old_Salary)
+
+ VALUES ('DELETE', OLD.SALARY);
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER customer_update
+
+AFTER UPDATE ON CUSTOMERS13 3.Trigger-Update
+
+FOR EACH ROW 
+
+BEGIN
+
+DECLARE salary_diff DECIMAL(10, 2);
+
+SET salary_diff = NEW.SALARY - OLD.SALARY;
+
+INSERT INTO Salary_Log (Action, Old_Salary, New_Salary, Salary_Difference)
+
+VALUES ('UPDATE', OLD.SALARY, NEW.SALARY, salary_diff);
+
+END$$
+
+DELIMITER ;
+
+UPDATE CUSTOMERS13 SET SALARY = 85000.00 WHERE ID = 1;}
+
+select * from Salary_log;}
+INSERT INTO CUSTOMERS13 (ID, NAME, AGE, ADDRESS, SALARY) VALUES (2, 
+
+'Abdullah', 30, '123 Elm St', 60000.00);
+
+INSERT INTO CUSTOMERS13 (ID, NAME, AGE, ADDRESS, SALARY) VALUES (3, 
+
+'Abu', 33, '123 Elm St', 70000.00);
+
+select * from customers13;
+
+DELETE FROM CUSTOMERS13 WHERE ID = 3;
+
+select * from Salary_log;
+
+
+
+
+
+
+
+PROG 5
+
+create table emp(E_id int, E_name varchar(20), Age int, Salary int)
+
+insert into emp values(01, 'Aslam', 35, 85000)
+
+DELIMITER $$
+
+CREATE PROCEDURE ExtractEmployeeData2()
+
+BEGIN
+
+ DECLARE done INT DEFAULT 0;
+
+ DECLARE e_id INT;
+
+ DECLARE e_name VARCHAR(255);
+
+ DECLARE age INT;
+
+ DECLARE salary DECIMAL(10,2);
+
+ 
+
+ -- Declare the cursor for employee table
+
+ DECLARE cur CURSOR FOR SELECT E_id, E_name, Age, Salary FROM emp;
+
+ 
+
+ -- Declare the NOT FOUND handler
+
+ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+ 
+
+ -- Open the cursor
+
+ OPEN cur;
+
+ 
+
+ -- Loop to fetch the data
+
+ read_loop: LOOP
+
+ FETCH cur INTO e_id, e_name, age, salary;
+
+ 
+
+ -- If no more rows, exit the loop
+
+ IF done THEN
+
+ LEAVE read_loop;
+ END IF;
+
+ 
+
+ -- Process the data (for demonstration purposes, we'll just select the values)
+
+ SELECT e_id, e_name, age, salary;
+
+ END LOOP;
+
+ -- Close the cursor
+
+ CLOSE cur;
+
+END$$
+
+DELIMITER ;
+
+CALL ExtractEmployeeData2();
+
+
+
+
+
+
+
+
+PROG 6
+
+CREATE TABLE IF NOT EXISTS N_RollCall ( Student_ID INT PRIMARY KEY,
+
+ Student_Name VARCHAR(100),
+
+ Roll_Number INT
+
+);
+
+CREATE TABLE IF NOT EXISTS O_RollCall (
+
+ Student_ID INT PRIMARY KEY,
+
+ Student_Name VARCHAR(100),
+
+ Roll_Number INT
+
+);
+
+DELIMITER //
+
+CREATE PROCEDURE merge_rollcall4()
+
+BEGIN
+
+ DECLARE done INT DEFAULT 0;
+
+ DECLARE student_id INT;
+
+ DECLARE student_name VARCHAR(100);
+
+ DECLARE roll_number INT;
+
+ -- Declare the cursor
+
+ DECLARE cur CURSOR FOR
+
+ SELECT Student_ID, Student_Name, Roll_Number FROM N_RollCall;
+
+ -- Declare CONTINUE HANDLER
+
+ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+ -- Open the cursor
+ OPEN cur;
+
+ -- Loop through the rows
+
+ read_loop: LOOP
+
+ FETCH cur INTO student_id, student_name, roll_number;
+
+ IF done THEN
+
+ LEAVE read_loop;
+
+ END IF;
+
+ -- Debugging: Output the fetched values
+
+ SELECT CONCAT('Fetched Student_ID: ', student_id, ', Student_Name: ', student_name, ', 
+
+Roll_Number: ', roll_number) AS debug_info;
+
+ -- Check if the record already exists in O_RollCall and the values are not null
+
+ IF student_id IS NOT NULL AND student_name IS NOT NULL AND roll_number IS NOT 
+
+NULL THEN
+
+ IF NOT EXISTS (SELECT 1 FROM O_RollCall WHERE Student_ID = student_id) THEN
+
+ -- Insert the record into O_RollCall if it does not exist
+
+ INSERT INTO O_RollCall (Student_ID, Student_Name, Roll_Number)
+
+ VALUES (student_id, student_name, roll_number);
+
+ 
+
+ -- Debugging: Output after insert
+
+ SELECT CONCAT('Inserted Student_ID: ', student_id) AS debug_insert;
+
+ ELSE
+
+ -- Debugging: Output if record exists
+
+ SELECT CONCAT('Skipped existing Student_ID: ', student_id) AS debug_skip;
+
+ END IF;
+
+ ELSE
+
+ -- Debugging: Output a message for null values
+
+ SELECT CONCAT('Null value found for Student_ID: ', student_id, ', Student_Name: ', 
+
+student_name, ', Roll_Number: ', roll_number) AS debug_info_null;
+
+ END IF;
+ END LOOP;
+
+ -- Close the cursor
+
+ CLOSE cur;
+
+ SELECT 'Merge process completed successfully.' AS status;
+
+END //
+
+DELIMITER ;
+
+CALL merge_rollcall4();
+
+DELETE FROM N_RollCall;
+
+DELETE FROM O_RollCall;
+
+INSERT INTO N_RollCall (Student_ID, Student_Name, Roll_Number) VALUES 
+
+(1, 'Alice', 101),
+
+(2, 'Bob', 102),
+
+(3, 'Charlie', 103);
+
+INSERT INTO O_RollCall (Student_ID, Student_Name, Roll_Number) VALUES 
+
+(2, 'Bob', 102),
+
+(4, 'David', 104);
+
+SELECT * FROM O_RollCall;
+
+CALL merge_rollcall4();
+
+SELECT * FROM O_RollCall;
